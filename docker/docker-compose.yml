@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  rate-limiter:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - PORT=3000
+    depends_on:
+      - redis
+    networks:
+      - rate-limiter-network
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rate-limiter-network
+    command: redis-server --appendonly yes
+
+networks:
+  rate-limiter-network:
+    driver: bridge
+
+volumes:
+  redis_data:
